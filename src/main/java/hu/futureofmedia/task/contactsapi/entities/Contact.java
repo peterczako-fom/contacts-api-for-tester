@@ -5,15 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.Objects;
+import java.time.ZonedDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,9 +16,6 @@ import java.util.Objects;
 @Accessors(chain = true)
 
 @Entity
-@EntityListeners(AuditingEntityListener.class)
-@SQLDelete(sql = "UPDATE contact SET status = 'DELETED' WHERE id=?")
-@Where(clause = "status = 'ACTIVE'")
 public class Contact {
 
     @Id
@@ -43,57 +34,21 @@ public class Contact {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @CreatedDate
-    private LocalDateTime createdDate;
+    private ZonedDateTime createdDate;
 
-    @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private ZonedDateTime lastModifiedDate;
 
-    public Contact(String firstName, String lastName, String email, String phoneNumber, Company company, String comment, Status status) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.company = company;
-        this.comment = comment;
-        this.status = status;
+    @PrePersist
+    private void setCreatedDate() {
+        this.createdDate = this.lastModifiedDate = ZonedDateTime.now();
+    }
+
+    @PreUpdate
+    private void setLastModifiedDate() {
+        this.lastModifiedDate = ZonedDateTime.now();
     }
 
     public enum Status {
         ACTIVE, DELETED
-    }
-
-    @PreRemove
-    private void preRemove() {
-        this.status = Status.DELETED;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Contact contact = (Contact) o;
-        return Objects.equals(id, contact.id) && firstName.equals(contact.firstName) && lastName.equals(contact.lastName) && email.equals(contact.email) && Objects.equals(phoneNumber, contact.phoneNumber) && company.equals(contact.company) && comment.equals(contact.comment) && status == contact.status && Objects.equals(createdDate, contact.createdDate) && Objects.equals(lastModifiedDate, contact.lastModifiedDate);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, firstName, lastName, email, phoneNumber, company, comment, status, createdDate, lastModifiedDate);
-    }
-
-    @Override
-    public String toString() {
-        return "Contact{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", company=" + company +
-                ", comment='" + comment + '\'' +
-                ", status=" + status +
-                ", createdDate=" + createdDate +
-                ", lastModifiedDate=" + lastModifiedDate +
-                '}';
     }
 }

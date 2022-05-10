@@ -15,9 +15,6 @@ public abstract class ContactMapper {
     public CompanyService companyService;
 
     @Mapping(target = "company", expression = "java(companyService.findCompanyById(dto.getCompanyId()))")
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdDate", ignore = true)
-    @Mapping(target = "lastModifiedDate", ignore = true)
     public abstract Contact dtoToEntityForCreate(ContactCreateAndUpdateDto dto);
 
     @Mapping(target = "companyId", source = "company.id")
@@ -30,8 +27,5 @@ public abstract class ContactMapper {
     public abstract ContactListItemDto entityToListItemDto(Contact entity);
 
     @Mapping(target = "company", expression = "java(companyService.findCompanyById(dto.getCompanyId()))")
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdDate", ignore = true)
-    @Mapping(target = "lastModifiedDate", ignore = true)
     public abstract void updateContact(@MappingTarget Contact entity, ContactCreateAndUpdateDto dto);
 }

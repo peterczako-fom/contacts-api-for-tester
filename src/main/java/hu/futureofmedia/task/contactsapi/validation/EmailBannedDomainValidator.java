@@ -2,6 +2,7 @@ package hu.futureofmedia.task.contactsapi.validation;
 
 import hu.futureofmedia.task.contactsapi.repositories.BannedDomainRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.util.StringUtils;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -13,7 +14,7 @@ public class EmailBannedDomainValidator implements ConstraintValidator<EmailBann
 
     @Override
     public boolean isValid(String email, ConstraintValidatorContext context) {
-        if(email == null || email.isEmpty()) {
+        if(!StringUtils.hasLength(email)) {
             return true;
         }
         var at = email.indexOf('@');

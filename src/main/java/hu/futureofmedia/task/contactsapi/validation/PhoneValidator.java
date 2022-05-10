@@ -1,16 +1,18 @@
 package hu.futureofmedia.task.contactsapi.validation;
 
+import org.springframework.util.StringUtils;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 public class PhoneValidator implements ConstraintValidator<PhoneNumber, String> {
 
     @Override
-    public boolean isValid(String value, ConstraintValidatorContext context) {
-        if(value == null || value.isEmpty()) {
+    public boolean isValid(String phoneNumber, ConstraintValidatorContext context) {
+        if(!StringUtils.hasLength(phoneNumber)) {
             return true;
         }
-        return value.matches("^\\+36\\d{9}$");
+        return phoneNumber.matches("^\\+36\\d{9}$");
     }
 
 }

@@ -1,29 +1,12 @@
 package hu.futureofmedia.task.contactsapi.service;
 
 import hu.futureofmedia.task.contactsapi.entities.Company;
-import hu.futureofmedia.task.contactsapi.exception.IdNotFoundException;
-import hu.futureofmedia.task.contactsapi.repositories.CompanyRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service
-@Transactional
-public class CompanyService {
+public interface CompanyService {
 
-    private final CompanyRepository companyRepository;
+    Company findCompanyById(Long id);
 
-    public CompanyService(CompanyRepository companyRepository) {
-        this.companyRepository = companyRepository;
-    }
-
-    public Company findCompanyById(Long id) {
-        return companyRepository.findById(id)
-                .orElseThrow(() -> new IdNotFoundException(id, Company.class));
-    }
-
-    public List<Company> findAll() {
-        return companyRepository.findAll();
-    }
+    List<Company> findAll();
 }

@@ -1,11 +1,10 @@
 package hu.futureofmedia.task.contactsapi.controller;
 
-import hu.futureofmedia.task.contactsapi.dto.ContactCreateDto;
+import hu.futureofmedia.task.contactsapi.dto.ContactCreateAndUpdateDto;
 import hu.futureofmedia.task.contactsapi.dto.ContactDto;
 import hu.futureofmedia.task.contactsapi.dto.ContactListDto;
 import hu.futureofmedia.task.contactsapi.exception.ErrorMessage;
 import hu.futureofmedia.task.contactsapi.service.ContactService;
-import hu.futureofmedia.task.contactsapi.utility.LoggerHelper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -15,33 +14,24 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Map;
 
 @RestController
 @RequestMapping(
-        path = "/api/v1/contacts",
-        produces = MediaType.APPLICATION_JSON_VALUE)
-@CrossOrigin("http://localhost:4200/")
+        path = "/v1/contacts")
 @RequiredArgsConstructor
 public class ContactController {
 
     private final ContactService contactService;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ContactController.class);
-
-    private final HttpServletRequest request;
-
-
     @Operation(
-            summary = "Create contact")
+            summary = "Create contact",
+            parameters = @Parameter(in = ParameterIn.QUERY, name = "dto", description = "Contact dto",
+                    content = @Content(schema = @Schema(implementation = ContactDto.class))))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Contact created",
                     content = @Content(schema = @Schema(implementation = ContactDto.class))),
@@ -49,11 +39,10 @@ public class ContactController {
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorMessage.class)))),
             @ApiResponse(responseCode = "404", description = "Given company id not found",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorMessage.class)))) })
-    @PostMapping("/create")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public ContactDto createContact(
-            @Valid @RequestBody ContactCreateDto command) {
-        LoggerHelper.requestLog(LOGGER, request, command);
+            @Valid @RequestBody ContactCreateAndUpdateDto command) {
         return contactService.createContact(command);
     }
 
@@ -66,14 +55,59 @@ public class ContactController {
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = ContactDto.class)))),
             @ApiResponse(responseCode = "400", description = "Given page is negative",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorMessage.class)))) })
-    @GetMapping("/list")
-    @ResponseStatus(HttpStatus.OK)
+    @GetMapping()
     public ContactListDto getAllContacts(
             @RequestParam(value = "page", defaultValue = "0") Integer page) {
-        LoggerHelper.requestLog(LOGGER, request);
         return contactService.getAllContacts(page);
     }
 
+    @Operation(
+            summary = "Get contact by id",
+            parameters = @Parameter(in = ParameterIn.QUERY, name = "id", description = "Contact id",
+                    content = @Content(schema = @Schema(example = "1L"))))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Contact returned"),
+            @ApiResponse(responseCode = "404", description = "Given id not found",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorMessage.class)))) })
+    @GetMapping("/{id}")
+    public ContactDto getContactById(@PathVariable Long id) {
+        return contactService.getContactById(id);
+    }
+
+    @Operation(
+            summary = "Update contact",
+            parameters = {
+                    @Parameter(in = ParameterIn.QUERY, name = "id", description = "Contact id",
+                            content = @Content(schema = @Schema(example = "1L"))),
+                    @Parameter(in = ParameterIn.QUERY, name = "dto", description = "Contact dto",
+                            content = @Content(schema = @Schema(implementation = ContactDto.class)))
+            })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Contact returned"),
+            @ApiResponse(responseCode = "404", description = "Given id not found",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorMessage.class)))) })
+    @PutMapping("/{id}")
+    public ContactDto updateContact(@PathVariable Long id, @RequestBody ContactCreateAndUpdateDto dto) {
+        return contactService.updateContact(id, dto);
+    }
+
+    @Operation(
+            summary = "Delete contact by id",
+            parameters = @Parameter(in = ParameterIn.QUERY, name = "id", description = "Contact id",
+                    content = @Content(schema = @Schema(example = "1L"))))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Contact deleted"),
+            @ApiResponse(responseCode = "404", description = "Given id not found",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorMessage.class)))) })
+    @DeleteMapping("/{id}")
+    public void deleteContact(@PathVariable Long id) {
+        contactService.deleteContact(id);
+    }
+
+    @Operation(
+            summary = "Map of companies")
+    @ApiResponse(responseCode = "200", description = "Returned map of companies",
+            content = @Content(schema = @Schema(implementation = Map.class)))
     @GetMapping("company-options")
     public Map<Long, String> getCompanyOptions() {
         return contactService.getCompanyOptions();

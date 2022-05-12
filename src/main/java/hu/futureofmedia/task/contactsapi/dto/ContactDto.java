@@ -32,7 +32,5 @@ public class ContactDto {
 
     @Schema(example = "Some comment for contact")
     private String comment;
-    private String createdDate;
-    private String lastModifiedDate;
 
 }

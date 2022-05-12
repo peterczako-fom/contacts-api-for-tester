@@ -1,6 +1,7 @@
 package hu.futureofmedia.task.contactsapi.service;
 
 import hu.futureofmedia.task.contactsapi.dto.ContactCreateAndUpdateDto;
+import hu.futureofmedia.task.contactsapi.dto.ContactDetailsDto;
 import hu.futureofmedia.task.contactsapi.dto.ContactDto;
 import hu.futureofmedia.task.contactsapi.dto.ContactListDto;
 
@@ -14,9 +15,12 @@ public interface ContactService {
 
     ContactDto getContactById(Long id);
 
+    ContactDetailsDto getContactDetailsById(Long id);
+
     ContactDto updateContact(Long id, ContactCreateAndUpdateDto dto);
 
     void deleteContact(Long id);
 
     Map<Long, String> getCompanyOptions();
+
 }

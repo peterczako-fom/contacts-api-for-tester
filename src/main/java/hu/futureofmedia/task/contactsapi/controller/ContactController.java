@@ -1,6 +1,7 @@
 package hu.futureofmedia.task.contactsapi.controller;
 
 import hu.futureofmedia.task.contactsapi.dto.ContactCreateAndUpdateDto;
+import hu.futureofmedia.task.contactsapi.dto.ContactDetailsDto;
 import hu.futureofmedia.task.contactsapi.dto.ContactDto;
 import hu.futureofmedia.task.contactsapi.dto.ContactListDto;
 import hu.futureofmedia.task.contactsapi.exception.ErrorMessage;
@@ -66,12 +67,27 @@ public class ContactController {
             parameters = @Parameter(in = ParameterIn.QUERY, name = "id", description = "Contact id",
                     content = @Content(schema = @Schema(example = "1L"))))
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Contact returned"),
+            @ApiResponse(responseCode = "200", description = "Contact returned",
+                    content = @Content(schema = @Schema(implementation = ContactDto.class))),
             @ApiResponse(responseCode = "404", description = "Given id not found",
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorMessage.class)))) })
     @GetMapping("/{id}")
     public ContactDto getContactById(@PathVariable Long id) {
         return contactService.getContactById(id);
+    }
+
+    @Operation(
+            summary = "Get contact details by id",
+            parameters = @Parameter(in = ParameterIn.QUERY, name = "id", description = "Contact id",
+                    content = @Content(schema = @Schema(example = "1L"))))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Contact details returned",
+                    content = @Content(schema = @Schema(implementation = ContactDetailsDto.class))),
+            @ApiResponse(responseCode = "404", description = "Given id not found",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ErrorMessage.class)))) })
+    @GetMapping("/{id}/details")
+    public ContactDetailsDto getContactDetailsById(@PathVariable Long id) {
+        return contactService.getContactDetailsById(id);
     }
 
     @Operation(

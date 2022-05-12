@@ -4,16 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import java.text.MessageFormat;
 import java.time.ZonedDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@Accessors(chain = true)
 
 @Entity
 public class Contact {
@@ -38,9 +37,14 @@ public class Contact {
 
     private ZonedDateTime lastModifiedDate;
 
+    public String getFullName() {
+        return MessageFormat.format("{0} {1}", this.firstName, this.lastName);
+    }
+
     @PrePersist
     private void setCreatedDate() {
-        this.createdDate = this.lastModifiedDate = ZonedDateTime.now();
+        this.createdDate = ZonedDateTime.now();
+        this.lastModifiedDate = this.createdDate;
     }
 
     @PreUpdate

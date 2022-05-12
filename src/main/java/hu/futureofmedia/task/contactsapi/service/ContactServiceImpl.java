@@ -1,6 +1,7 @@
 package hu.futureofmedia.task.contactsapi.service;
 
 import hu.futureofmedia.task.contactsapi.dto.ContactCreateAndUpdateDto;
+import hu.futureofmedia.task.contactsapi.dto.ContactDetailsDto;
 import hu.futureofmedia.task.contactsapi.dto.ContactDto;
 import hu.futureofmedia.task.contactsapi.dto.ContactListDto;
 import hu.futureofmedia.task.contactsapi.entities.Company;
@@ -31,7 +32,10 @@ public class ContactServiceImpl implements ContactService {
     private final ContactMapper contactMapper;
 
     public ContactDto createContact(ContactCreateAndUpdateDto dto) {
+        Company company = companyService.findCompanyById(dto.getCompanyId());
         Contact toSave = contactMapper.dtoToEntityForCreate(dto);
+
+        toSave.setCompany(company);
         toSave.setStatus(Contact.Status.ACTIVE);
         Contact saved = contactRepository.save(toSave);
         return contactMapper.entityToDto(saved);
@@ -41,7 +45,7 @@ public class ContactServiceImpl implements ContactService {
         Pageable pageable = PageRequest.of(page, contactProperties.getPageSize(), Sort.by("firstName", "lastName", "id").ascending());
 
         return new ContactListDto(
-                contactRepository.getAllActiveContact(pageable)
+                contactRepository.getAllContactByStatus(pageable, Contact.Status.ACTIVE)
                         .map(contactMapper::entityToListItemDto)
         );
     }
@@ -51,15 +55,23 @@ public class ContactServiceImpl implements ContactService {
         return contactMapper.entityToDto(entity);
     }
 
+    @Override
+    public ContactDetailsDto getContactDetailsById(Long id) {
+        Contact entity = getContactByIdOrThrowException(id);
+        return contactMapper.entityToDetailsDto(entity);
+    }
+
     public ContactDto updateContact(Long id, ContactCreateAndUpdateDto dto) {
+        Company company = companyService.findCompanyById(dto.getCompanyId());
         Contact saved = getContactByIdOrThrowException(id);
         contactMapper.updateContact(saved, dto);
+        saved.setCompany(company);
         Contact updated = contactRepository.save(saved);
         return contactMapper.entityToDto(updated);
     }
 
     public void deleteContact(Long id) {
-        contactRepository.deleteById(id);
+        contactRepository.updateStatusById(id, Contact.Status.DELETED);
     }
 
     public Map<Long, String> getCompanyOptions() {

@@ -19,4 +19,9 @@ public class LoggerHelper {
                                 .map(Object::toString)
                                 .collect(Collectors.joining(", ")));
     }
+
+    public static void log(Logger log, Object... args) {
+        log.info("data: {}", Arrays.stream(args).map(arg -> arg == null ? "null": arg.toString()).collect(Collectors.joining(", ")));
+
+    }
 }

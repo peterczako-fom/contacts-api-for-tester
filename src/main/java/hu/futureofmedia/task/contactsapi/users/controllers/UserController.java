@@ -8,6 +8,8 @@ import hu.futureofmedia.task.contactsapi.users.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(
         path = "/v1/users")
@@ -17,7 +19,8 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public UserDto createUser(UserCreateAndUpdateDto dto) {
+    public UserDto createUser(
+            @RequestBody @Valid UserCreateAndUpdateDto dto) {
         return userService.createUser(dto);
     }
 

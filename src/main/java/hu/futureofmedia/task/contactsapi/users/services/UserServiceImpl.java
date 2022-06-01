@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserServiceInner {
 
     private final AppUserRepository userRepository;
 
@@ -44,9 +44,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getUserByEmail(String email) {
+    public UserDto getUserByEmailOrThrow(String email) {
         return userRepository.findByEmail(email)
                 .map(userMapper::entityToDto)
+                .orElseThrow(() -> new IdNotFoundException(null, AppUser.class));
+    }
+
+    @Override
+    public AppUser findUserByEmailOrThrow(String email) {
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new IdNotFoundException(null, AppUser.class));
     }
 

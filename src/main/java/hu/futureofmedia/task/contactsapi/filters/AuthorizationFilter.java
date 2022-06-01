@@ -2,7 +2,6 @@ package hu.futureofmedia.task.contactsapi.filters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.futureofmedia.task.contactsapi.utility.JwtUtil;
-import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,7 +21,8 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 
     private final List<String> whitePaths = List.of(
             "/login",
-            "/auth/refresh-token"
+            "/auth/refresh-token",
+            "/v1/users"
     );
 
     private final UserDetailsService userDetailsService;

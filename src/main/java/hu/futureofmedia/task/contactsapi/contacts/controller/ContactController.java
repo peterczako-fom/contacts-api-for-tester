@@ -4,8 +4,8 @@ import hu.futureofmedia.task.contactsapi.contacts.dtos.ContactCreateAndUpdateDto
 import hu.futureofmedia.task.contactsapi.contacts.dtos.ContactDetailsDto;
 import hu.futureofmedia.task.contactsapi.contacts.dtos.ContactDto;
 import hu.futureofmedia.task.contactsapi.contacts.dtos.ContactListDto;
-import hu.futureofmedia.task.contactsapi.exception.ErrorMessage;
 import hu.futureofmedia.task.contactsapi.contacts.services.ContactService;
+import hu.futureofmedia.task.contactsapi.exception.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -130,4 +130,6 @@ public class ContactController {
     public Map<Long, String> getCompanyOptions() {
         return contactService.getCompanyOptions();
     }
+
+
 }

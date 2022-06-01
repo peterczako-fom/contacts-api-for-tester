@@ -28,7 +28,7 @@ public class AuthController {
         Claims claims = JwtUtil.decode(refreshToken);
 
         String username = claims.getSubject();
-        UserDto userDto = userService.getUserByEmail(username);
+        UserDto userDto = userService.getUserByEmailOrThrow(username);
 
         String accessToken = JwtUtil.generateAccessToken(userDto);
 

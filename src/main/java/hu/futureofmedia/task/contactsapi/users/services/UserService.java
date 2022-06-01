@@ -10,5 +10,6 @@ public interface UserService {
 
     UserDto createUser(UserCreateAndUpdateDto user);
 
-    UserDto getUserByEmail(String username);
+    UserDto getUserByEmailOrThrow(String username);
+
 }

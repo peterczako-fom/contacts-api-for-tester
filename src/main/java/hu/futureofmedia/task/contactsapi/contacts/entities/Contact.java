@@ -1,10 +1,7 @@
 package hu.futureofmedia.task.contactsapi.contacts.entities;
 
 import hu.futureofmedia.task.contactsapi.companies.entities.Company;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.text.MessageFormat;
@@ -16,6 +13,7 @@ import java.time.ZonedDateTime;
 @Setter
 
 @Entity
+@ToString
 public class Contact {
 
     @Id

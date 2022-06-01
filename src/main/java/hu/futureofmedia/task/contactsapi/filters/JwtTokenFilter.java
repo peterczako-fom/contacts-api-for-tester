@@ -1,15 +1,15 @@
 package hu.futureofmedia.task.contactsapi.filters;
 
-import hu.futureofmedia.task.contactsapi.auth.services.JwtTokenUtil;
+import hu.futureofmedia.task.contactsapi.auth.services.TokenService;
 import hu.futureofmedia.task.contactsapi.users.AppUserDetails;
 import hu.futureofmedia.task.contactsapi.users.repositories.AppUserRepository;
+import hu.futureofmedia.task.contactsapi.utility.JwtUtil;
 import hu.futureofmedia.task.contactsapi.utility.LoggerHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -19,16 +19,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-//@Component
+@Component
 @RequiredArgsConstructor
 @Slf4j
 public class JwtTokenFilter extends OncePerRequestFilter {
 
-    private final JwtTokenUtil jwtTokenUtil;
+    public static final String TOKEN_PREFIX = "Bearer ";
+
     private final AppUserRepository userRepository;
 
     @Override
@@ -41,19 +40,19 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         final String headerAuth = request.getHeader(HttpHeaders.AUTHORIZATION);
         LoggerHelper.log(log, headerAuth);
-        if(headerAuth == null || !headerAuth.startsWith("Bearer ")) {
+        if(headerAuth == null || !headerAuth.startsWith(TOKEN_PREFIX)) {
             filterChain.doFilter(request, response);
             return;
         }
-        final String token = headerAuth.split(" ")[1];
+        final String token = headerAuth.substring(TOKEN_PREFIX.length());
         LoggerHelper.log(log, token);
-        if(!jwtTokenUtil.validate(token)) {
+        if(JwtUtil.tokenExpired(token)) {
             filterChain.doFilter(request, response);
             return;
         }
 
         AppUserDetails userDetails = userRepository
-                .findByEmail(jwtTokenUtil.getEmail(token))
+                .findByEmail(JwtUtil.getEmailFromAccessToken(token))
                 .map(AppUserDetails::new)
                 .orElse(null);
 
